@@ -1,0 +1,36 @@
+name: Roblox Cloud Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Rojo
+        run: |
+          curl -L https://github.com/rojo-rbx/rojo/releases/download/v7.4.4/rojo-7.4.4-linux-x86_64.tar.gz | tar xz
+          sudo mv rojo /usr/local/bin/
+
+      - name: Build Roblox Place File (.rbxl)
+        run: |
+          rojo build default.project.json --output game.rbxl
+
+      - name: Publish to Roblox via Open Cloud
+        env:
+          ROBLOX_API_KEY: ${{ secrets.ROBLOX_API_KEY }}
+          ROBLOX_UNIVERSE_ID: ${{ secrets.ROBLOX_UNIVERSE_ID }}
+          ROBLOX_PLACE_ID: ${{ secrets.ROBLOX_PLACE_ID }}
+        run: |
+          echo "Publishing to Roblox..."
+          curl -X POST \
+            "https://apis.roblox.com/universes/v1/${ROBLOX_UNIVERSE_ID}/places/${ROBLOX_PLACE_ID}/versions?versionType=Published" \
+            -H "x-api-key: ${ROBLOX_API_KEY}" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary "@game.rbxl"
+          echo "✅ Deployment command sent!"
