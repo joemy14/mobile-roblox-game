@@ -1,0 +1,12 @@
+{
+     "name": "MobileGame",
+     "tree": {
+       "$className": "DataModel",
+       "ServerScriptService": {
+         "$className": "ServerScriptService",
+         "MainScript": {
+           "$path": "src/main.server.luau"
+         }
+       }
+     }
+}
