@@ -6,6 +6,9 @@ const { Octokit } = require('@octokit/rest');
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.get('/', (req, res) => {
+     res.sendFile(__dirname + '/index.html');
+   });
 
 console.log("✅ Smart Builder Server starting...");
 
