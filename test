@@ -1,1 +1,26 @@
-print("Test successful")
+print("Test script executed successfully")
+
+local function testFunction()
+	local a = 10
+	local b = 20
+	local sum = a + b
+	print("Sum:", sum)
+	return sum
+end
+
+testFunction()
+
+local testTable = {1, 2, 3, 4, 5}
+for i, v in ipairs(testTable) do
+	print("Index:", i, "Value:", v)
+end
+
+local success, result = pcall(function()
+	error("This is a test error")
+end)
+
+if not success then
+	warn("Caught error:", result)
+end
+
+print("All tests completed")
