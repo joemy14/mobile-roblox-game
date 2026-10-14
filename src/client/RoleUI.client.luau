@@ -1,70 +1,76 @@
 local Players = game:GetService("Players")
-local localPlayer = Players.LocalPlayer
+local LocalPlayer = Players.LocalPlayer
 
-local playerGui = localPlayer:WaitForChild("PlayerGui")
+while not LocalPlayer do
+	Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+	LocalPlayer = Players.LocalPlayer
+end
 
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "RoleGui"
-screenGui.ResetOnSpawn = false
-screenGui.Parent = playerGui
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
-local frame = Instance.new("Frame")
-frame.Name = "RoleFrame"
-frame.Size = UDim2.new(0, 250, 0, 350)
-frame.Position = UDim2.new(0.5, -125, 0.5, -175)
-frame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-frame.BorderSizePixel = 0
-frame.Parent = screenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "RoleGui"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
 
-local uICorner = Instance.new("UICorner")
-uICorner.CornerRadius = UDim.new(0, 12)
-uICorner.Parent = frame
+local Frame = Instance.new("Frame")
+Frame.Name = "RoleFrame"
+Frame.Size = UDim2.new(0, 200, 0, 280)
+Frame.Position = UDim2.new(0.5, -100, 0.5, -140)
+Frame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+Frame.BorderSizePixel = 0
+Frame.Parent = ScreenGui
 
-local titleLabel = Instance.new("TextLabel")
-titleLabel.Name = "TitleLabel"
-titleLabel.Size = UDim2.new(1, 0, 0, 50)
-titleLabel.Position = UDim2.new(0, 0, 0, 10)
-titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "Choose Your Role"
-titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-titleLabel.TextSize = 24
-titleLabel.Font = Enum.Font.GothamBold
-titleLabel.Parent = frame
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.Parent = Frame
 
-local buttonContainer = Instance.new("Frame")
-buttonContainer.Name = "ButtonContainer"
-buttonContainer.Size = UDim2.new(1, -20, 1, -80)
-buttonContainer.Position = UDim2.new(0, 10, 0, 70)
-buttonContainer.BackgroundTransparency = 1
-buttonContainer.Parent = frame
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Name = "TitleLabel"
+TitleLabel.Size = UDim2.new(1, -20, 0, 40)
+TitleLabel.Position = UDim2.new(0, 10, 0, 10)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text = "Choose Your Role"
+TitleLabel.TextColor3 = Color3.new(1, 1, 1)
+TitleLabel.TextSize = 20
+TitleLabel.Font = Enum.Font.GothamBold
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Center
+TitleLabel.Parent = Frame
 
-local uiListLayout = Instance.new("UIListLayout")
-uiListLayout.Padding = UDim.new(0, 10)
-uiListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-uiListLayout.VerticalAlignment = Enum.VerticalAlignment.Top
-uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-uiListLayout.Parent = buttonContainer
+local ButtonContainer = Instance.new("Frame")
+ButtonContainer.Name = "ButtonContainer"
+ButtonContainer.Size = UDim2.new(1, -20, 1, -60)
+ButtonContainer.Position = UDim2.new(0, 10, 0, 50)
+ButtonContainer.BackgroundTransparency = 1
+ButtonContainer.Parent = Frame
 
-local roleNames = {"Red Cross", "Skater", "Tanod", "Old Man"}
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Padding = UDim.new(0, 10)
+UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Top
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Parent = ButtonContainer
 
-for i, roleName in ipairs(roleNames) do
-	local button = Instance.new("TextButton")
-	button.Name = roleName .. "Button"
-	button.Size = UDim2.new(1, 0, 0, 50)
-	button.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
-	button.BorderSizePixel = 0
-	button.Text = roleName
-	button.TextColor3 = Color3.fromRGB(0, 0, 0)
-	button.TextSize = 20
-	button.Font = Enum.Font.GothamSemibold
-	button.LayoutOrder = i
-	button.Parent = buttonContainer
+local roles = {"Red Cross", "Skater", "Tanod", "Old Man"}
 
-	local buttonCorner = Instance.new("UICorner")
-	buttonCorner.CornerRadius = UDim.new(0, 8)
-	buttonCorner.Parent = button
+for i, roleName in ipairs(roles) do
+	local Button = Instance.new("TextButton")
+	Button.Name = roleName .. "Button"
+	Button.Size = UDim2.new(1, 0, 0, 45)
+	Button.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+	Button.BorderSizePixel = 0
+	Button.Text = roleName
+	Button.TextColor3 = Color3.new(0, 0, 0)
+	Button.TextSize = 18
+	Button.Font = Enum.Font.Gotham
+	Button.LayoutOrder = i
+	Button.Parent = ButtonContainer
 
-	button.MouseButton1Click:Connect(function()
+	local ButtonCorner = Instance.new("UICorner")
+	ButtonCorner.CornerRadius = UDim.new(0, 6)
+	ButtonCorner.Parent = Button
+
+	Button.MouseButton1Click:Connect(function()
 		print("Clicked: " .. roleName)
 	end)
 end
