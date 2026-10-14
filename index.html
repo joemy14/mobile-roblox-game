@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Mobile Roblox AI Builder</title>
+  <style>
+    body { font-family: -apple-system, sans-serif; padding: 20px; background: #1e1e1e; color: white; margin: 0; }
+    h2 { color: #00b06f; margin-top: 0; }
+    label { font-size: 14px; color: #aaa; display: block; margin-bottom: 5px; }
+    input, textarea, button { width: 100%; padding: 14px; margin-bottom: 20px; border-radius: 10px; border: 1px solid #444; background: #2d2d2d; color: white; font-size: 16px; box-sizing: border-box; }
+    button { background: #00b06f; color: white; font-weight: bold; border: none; cursor: pointer; font-size: 18px; }
+    button:active { background: #008f5a; }
+    #output { background: #2d2d2d; padding: 15px; border-radius: 10px; white-space: pre-wrap; font-size: 14px; border: 1px solid #444; min-height: 50px; }
+  </style>
+</head>
+<body>
+  <h2>📱 Mobile Roblox AI Builder</h2>
+  
+  <label>File Path:</label>
+  <input type="text" id="filePath" value="src/main.server.luau" placeholder="e.g., src/main.server.luau">
+  
+  <label>AI Prompt:</label>
+  <textarea id="prompt" rows="6" placeholder="Describe what you want..."></textarea>
+  
+  <button onclick="deploy()">Generate & Publish</button>
+  
+  <div id="output">Waiting for command...</div>
+
+  <script>
+    async function deploy() {
+      const output = document.getElementById('output');
+      const btn = document.querySelector('button');
+      output.innerText = "⏳ AI is thinking and deploying...";
+      btn.disabled = true;
+      btn.innerText = "Working...";
+      
+      try {
+        // POINTING TO YOUR RENDER BACKEND!
+        const res = await fetch('https://mobile-roblox-builder.onrender.com/api/build', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt: document.getElementById('prompt').value,
+            filePath: document.getElementById('filePath').value
+          })
+        });
+        
+        const rawText = await res.text(); 
+        if (!rawText) {
+          output.innerText = "⚠️ Empty response. Check Render logs!";
+          btn.disabled = false;
+          btn.innerText = "Generate & Publish";
+          return;
+        }
+        
+        const data = JSON.parse(rawText); 
+        output.innerText = data.message || data.error || "Done!";
+      } catch (err) {
+        output.innerText = "❌ Error: " + err.message;
+      }
+      
+      btn.disabled = false;
+      btn.innerText = "Generate & Publish";
+    }
+  </script>
+
+  <!-- Mobile Debug Console -->
+  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+  <script>eruda.init();</script>
+</body>
+</html>
