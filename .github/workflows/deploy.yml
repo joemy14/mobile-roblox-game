@@ -14,7 +14,8 @@ jobs:
 
       - name: Install Rojo
         run: |
-          curl -L https://github.com/rojo-rbx/rojo/releases/download/v7.7.1/rojo-7.7.1-linux-x86_64.tar.gz | tar xz
+          curl -L https://github.com/rojo-rbx/rojo/releases/download/v7.7.1/rojo-7.7.1-linux-x86_64.zip -o rojo.zip
+          unzip rojo.zip
           sudo mv rojo /usr/local/bin/
 
       - name: Build Roblox Place File (.rbxl)
