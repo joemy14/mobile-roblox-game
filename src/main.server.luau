@@ -1,127 +1,92 @@
+local Workspace = game:GetService("Workspace")
 local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
 
-local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
+local function createBaseplate()
+	local baseplate = Workspace:FindFirstChild("LobbyBaseplate")
+	if not baseplate then
+		baseplate = Instance.new("Part")
+		baseplate.Name = "LobbyBaseplate"
+		baseplate.Size = Vector3.new(200, 1, 200)
+		baseplate.Position = Vector3.new(0, -1, 0)
+		baseplate.Anchored = true
+		baseplate.Color = Color3.fromRGB(128, 128, 128)
+		baseplate.Material = Enum.Material.Concrete
+		baseplate.Parent = Workspace
+	end
+	return baseplate
+end
 
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "WelcomeScreen"
-screenGui.ResetOnSpawn = false
-screenGui.IgnoreGuiInset = true
-screenGui.Parent = playerGui
+local function createSpawnLocations(baseplate)
+	local spawnPositions = {
+		Vector3.new(-80, 0.5, -80),
+		Vector3.new(80, 0.5, -80),
+		Vector3.new(-80, 0.5, 80),
+		Vector3.new(80, 0.5, 80)
+	}
 
-local mainFrame = Instance.new("Frame")
-mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 500, 0, 300)
-mainFrame.Position = UDim2.new(0.5, -250, 0.5, -150)
-mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-mainFrame.BackgroundTransparency = 0.1
-mainFrame.BorderSizePixel = 0
-mainFrame.Parent = screenGui
+	for i, pos in ipairs(spawnPositions) do
+		local spawnName = "SpawnLocation_" .. i
+		if not Workspace:FindFirstChild(spawnName) then
+			local spawn = Instance.new("SpawnLocation")
+			spawn.Name = spawnName
+			spawn.Size = Vector3.new(6, 1, 6)
+			spawn.Position = pos
+			spawn.Anchored = true
+			spawn.Neutral = true
+			spawn.AllowTeamChangeOnTouch = false
+			spawn.Color = Color3.fromRGB(100, 100, 100)
+			spawn.Material = Enum.Material.Concrete
+			spawn.Parent = Workspace
+		end
+	end
+end
 
-local frameCorner = Instance.new("UICorner")
-frameCorner.CornerRadius = UDim.new(0, 12)
-frameCorner.Parent = mainFrame
-
-local frameStroke = Instance.new("UIStroke")
-frameStroke.Color = Color3.fromRGB(80, 80, 100)
-frameStroke.Thickness = 2
-frameStroke.Transparency = 0.3
-frameStroke.Parent = mainFrame
-
-local titleLabel = Instance.new("TextLabel")
-titleLabel.Name = "TitleLabel"
-titleLabel.Size = UDim2.new(1, -40, 0, 60)
-titleLabel.Position = UDim2.new(0, 20, 0, 40)
-titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "Infected Engkanto: Barangay Defense"
-titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-titleLabel.TextSize = 32
-titleLabel.Font = Enum.Font.GothamBold
-titleLabel.TextXAlignment = Enum.TextXAlignment.Center
-titleLabel.TextWrapped = true
-titleLabel.Parent = mainFrame
-
-local subtitleLabel = Instance.new("TextLabel")
-subtitleLabel.Name = "SubtitleLabel"
-subtitleLabel.Size = UDim2.new(1, -40, 0, 40)
-subtitleLabel.Position = UDim2.new(0, 20, 0, 100)
-subtitleLabel.BackgroundTransparency = 1
-subtitleLabel.Text = "Choose your role and prepare for the horde!"
-subtitleLabel.TextColor3 = Color3.fromRGB(200, 200, 210)
-subtitleLabel.TextSize = 18
-subtitleLabel.Font = Enum.Font.GothamMedium
-subtitleLabel.TextXAlignment = Enum.TextXAlignment.Center
-subtitleLabel.TextWrapped = true
-subtitleLabel.Parent = mainFrame
-
-local closeButton = Instance.new("TextButton")
-closeButton.Name = "CloseButton"
-closeButton.Size = UDim2.new(0, 140, 0, 44)
-closeButton.Position = UDim2.new(0.5, -70, 1, -70)
-closeButton.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
-closeButton.Text = "Close"
-closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeButton.TextSize = 18
-closeButton.Font = Enum.Font.GothamBold
-closeButton.BorderSizePixel = 0
-closeButton.Parent = mainFrame
-
-local buttonCorner = Instance.new("UICorner")
-buttonCorner.CornerRadius = UDim.new(0, 8)
-buttonCorner.Parent = closeButton
-
-local buttonStroke = Instance.new("UIStroke")
-buttonStroke.Color = Color3.fromRGB(255, 100, 100)
-buttonStroke.Thickness = 1.5
-buttonStroke.Transparency = 0.5
-buttonStroke.Parent = closeButton
-
-closeButton.MouseEnter:Connect(function()
-	local tween = TweenService:Create(closeButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(230, 80, 80)})
-	tween:Play()
-end)
-
-closeButton.MouseLeave:Connect(function()
-	local tween = TweenService:Create(closeButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(200, 60, 60)})
-	tween:Play()
-end)
-
-closeButton.MouseButton1Click:Connect(function()
-	local fadeOut = TweenService:Create(mainFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-		BackgroundTransparency = 1,
-		Position = UDim2.new(0.5, -250, 0.5, -170)
-	})
-	
-	local textFadeOut = TweenService:Create(titleLabel, TweenInfo.new(0.2), {TextTransparency = 1})
-	local subFadeOut = TweenService:Create(subtitleLabel, TweenInfo.new(0.2), {TextTransparency = 1})
-	local btnFadeOut = TweenService:Create(closeButton, TweenInfo.new(0.2), {BackgroundTransparency = 1, TextTransparency = 1})
-	
-	fadeOut:Play()
-	textFadeOut:Play()
-	subFadeOut:Play()
-	btnFadeOut:Play()
-	
-	fadeOut.Completed:Connect(function()
-		screenGui.Enabled = false
+local function disableFallDamage(player)
+	player.CharacterAdded:Connect(function(character)
+		local humanoid = character:WaitForChild("Humanoid", 5)
+		if humanoid then
+			humanoid.TakeDamageOnFall = false
+		end
 	end)
-end)
+end
 
-mainFrame.BackgroundTransparency = 1
-titleLabel.TextTransparency = 1
-subtitleLabel.TextTransparency = 1
-closeButton.BackgroundTransparency = 1
-closeButton.TextTransparency = 1
+local function createGameStarter()
+	if not Workspace:FindFirstChild("GameStarter") then
+		local starter = Instance.new("Part")
+		starter.Name = "GameStarter"
+		starter.Shape = Enum.PartType.Cylinder
+		starter.Size = Vector3.new(4, 6, 6)
+		starter.Position = Vector3.new(0, 5, -80)
+		starter.Anchored = true
+		starter.CanCollide = false
+		starter.Color = Color3.fromRGB(0, 100, 255)
+		starter.Material = Enum.Material.Neon
+		starter.Parent = Workspace
 
-local fadeIn = TweenService:Create(mainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-	BackgroundTransparency = 0.1,
-	Position = UDim2.new(0.5, -250, 0.5, -150)
-})
-local titleFadeIn = TweenService:Create(titleLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {TextTransparency = 0})
-local subFadeIn = TweenService:Create(subtitleLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {TextTransparency = 0})
-local btnFadeIn = TweenService:Create(closeButton, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {BackgroundTransparency = 0, TextTransparency = 0})
+		local pointLight = Instance.new("PointLight")
+		pointLight.Color = Color3.fromRGB(0, 100, 255)
+		pointLight.Range = 15
+		pointLight.Brightness = 2
+		pointLight.Parent = starter
 
-fadeIn:Play()
-titleFadeIn:Play()
-subFadeIn:Play()
-btnFadeIn:Play()
+		starter.Touched:Connect(function(hit)
+			local character = hit:FindFirstAncestorOfClass("Model")
+			if character then
+				local player = Players:GetPlayerFromCharacter(character)
+				if player then
+					print("Game starting...")
+				end
+			end
+		end)
+	end
+end
+
+local baseplate = createBaseplate()
+createSpawnLocations(baseplate)
+createGameStarter()
+
+Players.PlayerAdded:Connect(disableFallDamage)
+
+for _, player in ipairs(Players:GetPlayers()) do
+	disableFallDamage(player)
+end
