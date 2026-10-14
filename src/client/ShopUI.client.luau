@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
@@ -11,113 +12,156 @@ shopGui.Parent = playerGui
 
 local openButton = Instance.new("TextButton")
 openButton.Name = "OpenShopButton"
-openButton.Text = "OPEN SHOP"
-openButton.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
-openButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-openButton.Font = Enum.Font.SourceSansBold
+openButton.Text = "Open Shop"
+openButton.Font = Enum.Font.GothamBold
 openButton.TextSize = 18
-openButton.Size = UDim2.new(0, 140, 0, 40)
-openButton.Position = UDim2.new(1, -150, 1, -50)
-openButton.AnchorPoint = Vector2.new(1, 1)
+openButton.TextColor3 = Color3.new(1, 1, 1)
+openButton.TextStrokeTransparency = 0.8
+openButton.Size = UDim2.new(0, 160, 0, 50)
+openButton.Position = UDim2.new(1, -180, 1, -70)
+openButton.AnchorPoint = Vector2.new(0, 0)
+openButton.BackgroundColor3 = Color3.new(1, 1, 1)
+openButton.BorderSizePixel = 0
 openButton.Parent = shopGui
+
+local openGradient = Instance.new("UIGradient")
+openGradient.Color = ColorSequence.new({
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(180, 255, 100)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 200, 50))
+})
+openGradient.Rotation = 90
+openGradient.Parent = openButton
+
+local openCorner = Instance.new("UICorner")
+openCorner.CornerRadius = UDim.new(0.3, 0)
+openCorner.Parent = openButton
 
 local shopFrame = Instance.new("Frame")
 shopFrame.Name = "ShopFrame"
-shopFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-shopFrame.BorderSizePixel = 0
-shopFrame.Size = UDim2.new(0, 300, 0, 350)
+shopFrame.Size = UDim2.new(0, 300, 0, 400)
 shopFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 shopFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+shopFrame.BackgroundColor3 = Color3.new(1, 1, 1)
+shopFrame.BorderSizePixel = 0
 shopFrame.Visible = false
 shopFrame.Parent = shopGui
+
+local frameGradient = Instance.new("UIGradient")
+frameGradient.Color = ColorSequence.new({
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 30, 60)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 15, 30))
+})
+frameGradient.Rotation = 90
+frameGradient.Parent = shopFrame
+
+local frameCorner = Instance.new("UICorner")
+frameCorner.CornerRadius = UDim.new(0.2, 0)
+frameCorner.Parent = shopFrame
+
+local listLayout = Instance.new("UIListLayout")
+listLayout.Padding = UDim.new(0, 10)
+listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+listLayout.VerticalAlignment = Enum.VerticalAlignment.Top
+listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+listLayout.Parent = shopFrame
+
+local padding = Instance.new("UIPadding")
+padding.PaddingTop = UDim.new(0, 15)
+padding.PaddingBottom = UDim.new(0, 15)
+padding.PaddingLeft = UDim.new(0, 15)
+padding.PaddingRight = UDim.new(0, 15)
+padding.Parent = shopFrame
 
 local coinLabel = Instance.new("TextLabel")
 coinLabel.Name = "CoinLabel"
 coinLabel.Text = "Coins: 0"
-coinLabel.BackgroundTransparency = 1
-coinLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-coinLabel.Font = Enum.Font.SourceSansBold
+coinLabel.Font = Enum.Font.GothamBold
 coinLabel.TextSize = 24
-coinLabel.Size = UDim2.new(1, -20, 0, 40)
-coinLabel.Position = UDim2.new(0, 10, 0, 10)
-coinLabel.TextXAlignment = Enum.TextXAlignment.Left
+coinLabel.TextColor3 = Color3.new(1, 1, 1)
+coinLabel.BackgroundTransparency = 1
+coinLabel.Size = UDim2.new(1, 0, 0, 40)
+coinLabel.LayoutOrder = 1
 coinLabel.Parent = shopFrame
 
-local buttonContainer = Instance.new("Frame")
-buttonContainer.Name = "ButtonContainer"
-buttonContainer.BackgroundTransparency = 1
-buttonContainer.Size = UDim2.new(1, -20, 1, -100)
-buttonContainer.Position = UDim2.new(0, 10, 0, 60)
-buttonContainer.Parent = shopFrame
-
-local uiListLayout = Instance.new("UIListLayout")
-uiListLayout.Padding = UDim.new(0, 10)
-uiListLayout.FillDirection = Enum.FillDirection.Vertical
-uiListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-uiListLayout.VerticalAlignment = Enum.VerticalAlignment.Top
-uiListLayout.Parent = buttonContainer
-
-local buyItems = {
-	{name = "SpeedBoost", display = "Buy Speed (100)"},
-	{name = "ExtraHealth", display = "Buy Health (150)"},
-	{name = "Flashlight", display = "Buy Flashlight (200)"}
-}
-
-for _, item in ipairs(buyItems) do
+local function createBuyButton(text, layoutOrder, itemName)
 	local btn = Instance.new("TextButton")
-	btn.Name = item.name .. "Button"
-	btn.Text = item.display
-	btn.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
-	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-	btn.Font = Enum.Font.SourceSans
-	btn.TextSize = 18
-	btn.Size = UDim2.new(1, 0, 0, 45)
-	btn.Parent = buttonContainer
-	
-	btn.MouseButton1Click:Connect(function()
-		local buyEvent = ReplicatedStorage:FindFirstChild("BuyItemEvent")
-		if buyEvent then
-			buyEvent:FireServer(item.name)
-		end
-	end)
+	btn.Name = itemName .. "Button"
+	btn.Text = text
+	btn.Font = Enum.Font.GothamSemibold
+	btn.TextSize = 20
+	btn.TextColor3 = Color3.new(0, 0, 0)
+	btn.Size = UDim2.new(1, 0, 0, 50)
+	btn.BackgroundColor3 = Color3.new(1, 1, 1)
+	btn.BorderSizePixel = 0
+	btn.LayoutOrder = layoutOrder
+	btn.Parent = shopFrame
+
+	local grad = Instance.new("UIGradient")
+	grad.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 220, 100)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 160, 50))
+	})
+	grad.Rotation = 90
+	grad.Parent = btn
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0.2, 0)
+	corner.Parent = btn
+
+	return btn
 end
+
+local speedBtn = createBuyButton("Buy Speed (100)", 2, "Speed")
+local healthBtn = createBuyButton("Buy Health (150)", 3, "Health")
+local flashlightBtn = createBuyButton("Buy Flashlight (200)", 4, "Flashlight")
 
 local closeButton = Instance.new("TextButton")
 closeButton.Name = "CloseButton"
 closeButton.Text = "CLOSE"
-closeButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeButton.Font = Enum.Font.SourceSansBold
-closeButton.TextSize = 18
-closeButton.Size = UDim2.new(1, -20, 0, 40)
-closeButton.Position = UDim2.new(0, 10, 1, -50)
-closeButton.AnchorPoint = Vector2.new(0, 1)
+closeButton.Font = Enum.Font.GothamBold
+closeButton.TextSize = 20
+closeButton.TextColor3 = Color3.new(1, 1, 1)
+closeButton.Size = UDim2.new(1, 0, 0, 50)
+closeButton.BackgroundColor3 = Color3.new(1, 1, 1)
+closeButton.BorderSizePixel = 0
+closeButton.LayoutOrder = 5
 closeButton.Parent = shopFrame
 
-local buyEvent = ReplicatedStorage:WaitForChild("BuyItemEvent")
-local updateEvent = ReplicatedStorage:WaitForChild("ShopUpdateEvent")
+local closeGradient = Instance.new("UIGradient")
+closeGradient.Color = ColorSequence.new({
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 80, 80)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(180, 0, 0))
+})
+closeGradient.Rotation = 90
+closeGradient.Parent = closeButton
 
-updateEvent.OnClientEvent:Connect(function(newAmount)
-	coinLabel.Text = "Coins: " .. tostring(newAmount)
-end)
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0.2, 0)
+closeCorner.Parent = closeButton
 
-local function updateCoinsFromLeaderstats()
-	local leaderstats = player:FindFirstChild("leaderstats")
-	if leaderstats then
-		local coins = leaderstats:FindFirstChild("Coins")
-		if coins and coins:IsA("IntValue") then
-			coinLabel.Text = "Coins: " .. tostring(coins.Value)
-		end
-	end
-end
+local buyItemEvent = ReplicatedStorage:WaitForChild("BuyItemEvent")
+local shopUpdateEvent = ReplicatedStorage:WaitForChild("ShopUpdateEvent")
 
 openButton.MouseButton1Click:Connect(function()
-	updateCoinsFromLeaderstats()
 	shopFrame.Visible = true
-	openButton.Visible = false
 end)
 
 closeButton.MouseButton1Click:Connect(function()
 	shopFrame.Visible = false
-	openButton.Visible = true
+end)
+
+local buttons = {
+	[speedBtn] = "Speed",
+	[healthBtn] = "Health",
+	[flashlightBtn] = "Flashlight"
+}
+
+for btn, itemName in pairs(buttons) do
+	btn.MouseButton1Click:Connect(function()
+		buyItemEvent:FireServer(itemName)
+	end)
+end
+
+shopUpdateEvent.OnClientEvent:Connect(function(coins)
+	coinLabel.Text = "Coins: " .. tostring(coins)
 end)
