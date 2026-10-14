@@ -157,11 +157,15 @@ CloseCorner.Parent = CloseButton
 local BuyItemEvent = ReplicatedStorage:WaitForChild("BuyItemEvent")
 local ShopUpdateEvent = ReplicatedStorage:WaitForChild("ShopUpdateEvent")
 
-local RoleSelectedEvent = ReplicatedStorage:FindFirstChild("RoleSelectedEvent")
+local RoleSelectedEvent = ReplicatedStorage:WaitForChild("RoleSelectedEvent", 10)
 if not RoleSelectedEvent then
+	warn("RoleSelectedEvent not found in ReplicatedStorage after 10 seconds")
 	RoleSelectedEvent = Instance.new("BindableEvent")
 	RoleSelectedEvent.Name = "RoleSelectedEvent"
-	RoleSelectedEvent.Parent = ReplicatedStorage
+end
+
+local function showOpenButton()
+	OpenButton.Visible = true
 end
 
 OpenButton.MouseButton1Click:Connect(function()
@@ -188,6 +192,21 @@ ShopUpdateEvent.OnClientEvent:Connect(function(newCoinAmount)
 	CoinLabel.Text = "Coins: " .. tostring(newCoinAmount)
 end)
 
-RoleSelectedEvent.Event:Connect(function()
-	OpenButton.Visible = true
+if RoleSelectedEvent:IsA("RemoteEvent") then
+	RoleSelectedEvent.OnClientEvent:Connect(showOpenButton)
+elseif RoleSelectedEvent:IsA("BindableEvent") then
+	RoleSelectedEvent.Event:Connect(showOpenButton)
+end
+
+task.spawn(function()
+	local roleSelected = LocalPlayer:GetAttribute("RoleSelected")
+	if roleSelected == true then
+		showOpenButton()
+	else
+		LocalPlayer:GetAttributeChangedSignal("RoleSelected"):Connect(function()
+			if LocalPlayer:GetAttribute("RoleSelected") == true then
+				showOpenButton()
+			end
+		end)
+	end
 end)
