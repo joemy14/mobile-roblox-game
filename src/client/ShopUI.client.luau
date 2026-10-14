@@ -23,6 +23,7 @@ OpenButton.AnchorPoint = Vector2.new(1, 1)
 OpenButton.BackgroundColor3 = Color3.new(1, 1, 1)
 OpenButton.BorderSizePixel = 0
 OpenButton.AutoButtonColor = true
+OpenButton.Visible = false
 OpenButton.Parent = ShopGui
 
 local OpenGradient = Instance.new("UIGradient")
@@ -156,6 +157,13 @@ CloseCorner.Parent = CloseButton
 local BuyItemEvent = ReplicatedStorage:WaitForChild("BuyItemEvent")
 local ShopUpdateEvent = ReplicatedStorage:WaitForChild("ShopUpdateEvent")
 
+local RoleSelectedEvent = ReplicatedStorage:FindFirstChild("RoleSelectedEvent")
+if not RoleSelectedEvent then
+	RoleSelectedEvent = Instance.new("BindableEvent")
+	RoleSelectedEvent.Name = "RoleSelectedEvent"
+	RoleSelectedEvent.Parent = ReplicatedStorage
+end
+
 OpenButton.MouseButton1Click:Connect(function()
 	ShopFrame.Visible = true
 end)
@@ -178,4 +186,8 @@ end
 
 ShopUpdateEvent.OnClientEvent:Connect(function(newCoinAmount)
 	CoinLabel.Text = "Coins: " .. tostring(newCoinAmount)
+end)
+
+RoleSelectedEvent.Event:Connect(function()
+	OpenButton.Visible = true
 end)
