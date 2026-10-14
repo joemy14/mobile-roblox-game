@@ -1,141 +1,123 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
-local ShopGui = Instance.new("ScreenGui")
-ShopGui.Name = "ShopGui"
-ShopGui.ResetOnSpawn = false
-ShopGui.Parent = PlayerGui
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
 
-local OpenButton = Instance.new("TextButton")
-OpenButton.Name = "OpenButton"
-OpenButton.Size = UDim2.new(0, 150, 0, 50)
-OpenButton.Position = UDim2.new(1, -160, 1, -60)
-OpenButton.AnchorPoint = Vector2.new(0, 0)
-OpenButton.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
-OpenButton.Text = "OPEN SHOP"
-OpenButton.TextScaled = true
-OpenButton.Font = Enum.Font.SourceSansBold
-OpenButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-OpenButton.Parent = ShopGui
+local shopGui = Instance.new("ScreenGui")
+shopGui.Name = "ShopGui"
+shopGui.ResetOnSpawn = false
+shopGui.Parent = playerGui
 
-local ShopFrame = Instance.new("Frame")
-ShopFrame.Name = "ShopFrame"
-ShopFrame.Size = UDim2.new(0, 300, 0, 350)
-ShopFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-ShopFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-ShopFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-ShopFrame.BorderSizePixel = 0
-ShopFrame.Visible = false
-ShopFrame.Parent = ShopGui
+local openButton = Instance.new("TextButton")
+openButton.Name = "OpenShopButton"
+openButton.Text = "OPEN SHOP"
+openButton.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
+openButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+openButton.Font = Enum.Font.SourceSansBold
+openButton.TextSize = 18
+openButton.Size = UDim2.new(0, 140, 0, 40)
+openButton.Position = UDim2.new(1, -150, 1, -50)
+openButton.AnchorPoint = Vector2.new(1, 1)
+openButton.Parent = shopGui
 
-local UIListLayout = Instance.new("UIListLayout")
-UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-UIListLayout.Padding = UDim.new(0, 10)
-UIListLayout.Parent = ShopFrame
+local shopFrame = Instance.new("Frame")
+shopFrame.Name = "ShopFrame"
+shopFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+shopFrame.BorderSizePixel = 0
+shopFrame.Size = UDim2.new(0, 300, 0, 350)
+shopFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+shopFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+shopFrame.Visible = false
+shopFrame.Parent = shopGui
 
-local UIPadding = Instance.new("UIPadding")
-UIPadding.PaddingTop = UDim.new(0, 15)
-UIPadding.PaddingBottom = UDim.new(0, 15)
-UIPadding.PaddingLeft = UDim.new(0, 15)
-UIPadding.PaddingRight = UDim.new(0, 15)
-UIPadding.Parent = ShopFrame
+local coinLabel = Instance.new("TextLabel")
+coinLabel.Name = "CoinLabel"
+coinLabel.Text = "Coins: 0"
+coinLabel.BackgroundTransparency = 1
+coinLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+coinLabel.Font = Enum.Font.SourceSansBold
+coinLabel.TextSize = 24
+coinLabel.Size = UDim2.new(1, -20, 0, 40)
+coinLabel.Position = UDim2.new(0, 10, 0, 10)
+coinLabel.TextXAlignment = Enum.TextXAlignment.Left
+coinLabel.Parent = shopFrame
 
-local CoinLabel = Instance.new("TextLabel")
-CoinLabel.Name = "CoinLabel"
-CoinLabel.Size = UDim2.new(1, 0, 0, 40)
-CoinLabel.BackgroundTransparency = 1
-CoinLabel.Text = "Coins: 0"
-CoinLabel.TextScaled = true
-CoinLabel.Font = Enum.Font.SourceSansBold
-CoinLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
-CoinLabel.TextXAlignment = Enum.TextXAlignment.Center
-CoinLabel.LayoutOrder = 1
-CoinLabel.Parent = ShopFrame
+local buttonContainer = Instance.new("Frame")
+buttonContainer.Name = "ButtonContainer"
+buttonContainer.BackgroundTransparency = 1
+buttonContainer.Size = UDim2.new(1, -20, 1, -100)
+buttonContainer.Position = UDim2.new(0, 10, 0, 60)
+buttonContainer.Parent = shopFrame
 
-local BuySpeed = Instance.new("TextButton")
-BuySpeed.Name = "BuySpeed"
-BuySpeed.Size = UDim2.new(1, 0, 0, 50)
-BuySpeed.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-BuySpeed.Text = "Buy Speed (100)"
-BuySpeed.TextScaled = true
-BuySpeed.Font = Enum.Font.SourceSans
-BuySpeed.TextColor3 = Color3.fromRGB(255, 255, 255)
-BuySpeed.LayoutOrder = 2
-BuySpeed.Parent = ShopFrame
+local uiListLayout = Instance.new("UIListLayout")
+uiListLayout.Padding = UDim.new(0, 10)
+uiListLayout.FillDirection = Enum.FillDirection.Vertical
+uiListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+uiListLayout.VerticalAlignment = Enum.VerticalAlignment.Top
+uiListLayout.Parent = buttonContainer
 
-local BuyHealth = Instance.new("TextButton")
-BuyHealth.Name = "BuyHealth"
-BuyHealth.Size = UDim2.new(1, 0, 0, 50)
-BuyHealth.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-BuyHealth.Text = "Buy Health (150)"
-BuyHealth.TextScaled = true
-BuyHealth.Font = Enum.Font.SourceSans
-BuyHealth.TextColor3 = Color3.fromRGB(255, 255, 255)
-BuyHealth.LayoutOrder = 3
-BuyHealth.Parent = ShopFrame
+local buyItems = {
+	{name = "SpeedBoost", display = "Buy Speed (100)"},
+	{name = "ExtraHealth", display = "Buy Health (150)"},
+	{name = "Flashlight", display = "Buy Flashlight (200)"}
+}
 
-local BuyFlashlight = Instance.new("TextButton")
-BuyFlashlight.Name = "BuyFlashlight"
-BuyFlashlight.Size = UDim2.new(1, 0, 0, 50)
-BuyFlashlight.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-BuyFlashlight.Text = "Buy Flashlight (200)"
-BuyFlashlight.TextScaled = true
-BuyFlashlight.Font = Enum.Font.SourceSans
-BuyFlashlight.TextColor3 = Color3.fromRGB(255, 255, 255)
-BuyFlashlight.LayoutOrder = 4
-BuyFlashlight.Parent = ShopFrame
-
-local CloseButton = Instance.new("TextButton")
-CloseButton.Name = "CloseButton"
-CloseButton.Size = UDim2.new(1, 0, 0, 50)
-CloseButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-CloseButton.Text = "CLOSE"
-CloseButton.TextScaled = true
-CloseButton.Font = Enum.Font.SourceSansBold
-CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseButton.LayoutOrder = 5
-CloseButton.Parent = ShopFrame
-
-local BuyItemEvent = ReplicatedStorage:WaitForChild("BuyItemEvent")
-local ShopUpdateEvent = ReplicatedStorage:WaitForChild("ShopUpdateEvent")
-
-local function updateCoinLabel(amount)
-	CoinLabel.Text = "Coins: " .. tostring(amount)
+for _, item in ipairs(buyItems) do
+	local btn = Instance.new("TextButton")
+	btn.Name = item.name .. "Button"
+	btn.Text = item.display
+	btn.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	btn.Font = Enum.Font.SourceSans
+	btn.TextSize = 18
+	btn.Size = UDim2.new(1, 0, 0, 45)
+	btn.Parent = buttonContainer
+	
+	btn.MouseButton1Click:Connect(function()
+		local buyEvent = ReplicatedStorage:FindFirstChild("BuyItemEvent")
+		if buyEvent then
+			buyEvent:FireServer(item.name)
+		end
+	end)
 end
 
-local function tryUpdateCoinsFromLeaderstats()
-	local leaderstats = LocalPlayer:FindFirstChild("leaderstats")
+local closeButton = Instance.new("TextButton")
+closeButton.Name = "CloseButton"
+closeButton.Text = "CLOSE"
+closeButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.Font = Enum.Font.SourceSansBold
+closeButton.TextSize = 18
+closeButton.Size = UDim2.new(1, -20, 0, 40)
+closeButton.Position = UDim2.new(0, 10, 1, -50)
+closeButton.AnchorPoint = Vector2.new(0, 1)
+closeButton.Parent = shopFrame
+
+local buyEvent = ReplicatedStorage:WaitForChild("BuyItemEvent")
+local updateEvent = ReplicatedStorage:WaitForChild("ShopUpdateEvent")
+
+updateEvent.OnClientEvent:Connect(function(newAmount)
+	coinLabel.Text = "Coins: " .. tostring(newAmount)
+end)
+
+local function updateCoinsFromLeaderstats()
+	local leaderstats = player:FindFirstChild("leaderstats")
 	if leaderstats then
 		local coins = leaderstats:FindFirstChild("Coins")
 		if coins and coins:IsA("IntValue") then
-			updateCoinLabel(coins.Value)
+			coinLabel.Text = "Coins: " .. tostring(coins.Value)
 		end
 	end
 end
 
-OpenButton.MouseButton1Click:Connect(function()
-	ShopFrame.Visible = true
-	tryUpdateCoinsFromLeaderstats()
+openButton.MouseButton1Click:Connect(function()
+	updateCoinsFromLeaderstats()
+	shopFrame.Visible = true
+	openButton.Visible = false
 end)
 
-CloseButton.MouseButton1Click:Connect(function()
-	ShopFrame.Visible = false
-end)
-
-BuySpeed.MouseButton1Click:Connect(function()
-	BuyItemEvent:FireServer("SpeedBoost")
-end)
-
-BuyHealth.MouseButton1Click:Connect(function()
-	BuyItemEvent:FireServer("ExtraHealth")
-end)
-
-BuyFlashlight.MouseButton1Click:Connect(function()
-	BuyItemEvent:FireServer("Flashlight")
-end)
-
-ShopUpdateEvent.OnClientEvent:Connect(function(newAmount)
-	updateCoinLabel(newAmount)
+closeButton.MouseButton1Click:Connect(function()
+	shopFrame.Visible = false
+	openButton.Visible = true
 end)
