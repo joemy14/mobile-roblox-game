@@ -1,95 +1,127 @@
-local Workspace = game:GetService("Workspace")
 local Players = game:GetService("Players")
-local Lighting = game:GetService("Lighting")
+local TweenService = game:GetService("TweenService")
 
--- 1. Create lobby floor: 200x200 studs at (0,0,0), gray color
-local lobbyFloor = Instance.new("Part")
-lobbyFloor.Name = "LobbyFloor"
-lobbyFloor.Size = Vector3.new(200, 1, 200)
-lobbyFloor.Position = Vector3.new(0, 0, 0)
-lobbyFloor.Anchored = true
-lobbyFloor.Color = Color3.fromRGB(128, 128, 128)
-lobbyFloor.Material = Enum.Material.Concrete
-lobbyFloor.Parent = Workspace
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
 
--- 2. Create 4 SpawnLocation objects on the platform
-local spawnPositions = {
-	Vector3.new(-50, 1, -50),
-	Vector3.new(50, 1, -50),
-	Vector3.new(-50, 1, 50),
-	Vector3.new(50, 1, 50)
-}
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "WelcomeScreen"
+screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = true
+screenGui.Parent = playerGui
 
-for i, pos in ipairs(spawnPositions) do
-	local spawn = Instance.new("SpawnLocation")
-	spawn.Name = "LobbySpawn" .. i
-	spawn.Size = Vector3.new(6, 1, 6)
-	spawn.Position = pos
-	spawn.Anchored = true
-	spawn.Neutral = true
-	spawn.AllowTeamChangeOnTouch = true
-	spawn.Color = Color3.fromRGB(200, 200, 200)
-	spawn.Material = Enum.Material.Neon
-	spawn.Parent = Workspace
-end
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 500, 0, 300)
+mainFrame.Position = UDim2.new(0.5, -250, 0.5, -150)
+mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+mainFrame.BackgroundTransparency = 0.1
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
 
--- 3. Create GameStarter part: glowing blue cylinder at (0, 5, -80)
-local gameStarter = Instance.new("Part")
-gameStarter.Name = "GameStarter"
-gameStarter.Shape = Enum.PartType.Cylinder
-gameStarter.Size = Vector3.new(4, 8, 8)
-gameStarter.Position = Vector3.new(0, 5, -80)
-gameStarter.Anchored = true
-gameStarter.Color = Color3.fromRGB(0, 170, 255)
-gameStarter.Material = Enum.Material.Neon
-gameStarter.CanCollide = false
-gameStarter.Parent = Workspace
+local frameCorner = Instance.new("UICorner")
+frameCorner.CornerRadius = UDim.new(0, 12)
+frameCorner.Parent = mainFrame
 
--- Add PointLight for glow effect
-local light = Instance.new("PointLight")
-light.Color = Color3.fromRGB(0, 170, 255)
-light.Brightness = 2
-light.Range = 20
-light.Parent = gameStarter
+local frameStroke = Instance.new("UIStroke")
+frameStroke.Color = Color3.fromRGB(80, 80, 100)
+frameStroke.Thickness = 2
+frameStroke.Transparency = 0.3
+frameStroke.Parent = mainFrame
 
--- Touch event: print when player touches GameStarter
-gameStarter.Touched:Connect(function(hit)
-	local character = hit.Parent
-	local player = Players:GetPlayerFromCharacter(character)
-	if player then
-		print("Player wants to start game!")
-	end
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Name = "TitleLabel"
+titleLabel.Size = UDim2.new(1, -40, 0, 60)
+titleLabel.Position = UDim2.new(0, 20, 0, 40)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "Infected Engkanto: Barangay Defense"
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.TextSize = 32
+titleLabel.Font = Enum.Font.GothamBold
+titleLabel.TextXAlignment = Enum.TextXAlignment.Center
+titleLabel.TextWrapped = true
+titleLabel.Parent = mainFrame
+
+local subtitleLabel = Instance.new("TextLabel")
+subtitleLabel.Name = "SubtitleLabel"
+subtitleLabel.Size = UDim2.new(1, -40, 0, 40)
+subtitleLabel.Position = UDim2.new(0, 20, 0, 100)
+subtitleLabel.BackgroundTransparency = 1
+subtitleLabel.Text = "Choose your role and prepare for the horde!"
+subtitleLabel.TextColor3 = Color3.fromRGB(200, 200, 210)
+subtitleLabel.TextSize = 18
+subtitleLabel.Font = Enum.Font.GothamMedium
+subtitleLabel.TextXAlignment = Enum.TextXAlignment.Center
+subtitleLabel.TextWrapped = true
+subtitleLabel.Parent = mainFrame
+
+local closeButton = Instance.new("TextButton")
+closeButton.Name = "CloseButton"
+closeButton.Size = UDim2.new(0, 140, 0, 44)
+closeButton.Position = UDim2.new(0.5, -70, 1, -70)
+closeButton.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
+closeButton.Text = "Close"
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.TextSize = 18
+closeButton.Font = Enum.Font.GothamBold
+closeButton.BorderSizePixel = 0
+closeButton.Parent = mainFrame
+
+local buttonCorner = Instance.new("UICorner")
+buttonCorner.CornerRadius = UDim.new(0, 8)
+buttonCorner.Parent = closeButton
+
+local buttonStroke = Instance.new("UIStroke")
+buttonStroke.Color = Color3.fromRGB(255, 100, 100)
+buttonStroke.Thickness = 1.5
+buttonStroke.Transparency = 0.5
+buttonStroke.Parent = closeButton
+
+closeButton.MouseEnter:Connect(function()
+	local tween = TweenService:Create(closeButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(230, 80, 80)})
+	tween:Play()
 end)
 
--- 4. Add skybox with daytime sky
-local sky = Instance.new("Sky")
-sky.SkyboxBk = "rbxasset://sky/sb_back.jpg"
-sky.SkyboxDn = "rbxasset://sky/sb_down.jpg"
-sky.SkyboxFt = "rbxasset://sky/sb_front.jpg"
-sky.SkyboxLf = "rbxasset://sky/sb_left.jpg"
-sky.SkyboxRt = "rbxasset://sky/sb_right.jpg"
-sky.SkyboxUp = "rbxasset://sky/sb_up.jpg"
-sky.SunTextureId = "rbxasset://sky/sun.jpg"
-sky.MoonTextureId = "rbxasset://sky/moon.jpg"
-sky.SunAngularSize = 10
-sky.MoonAngularSize = 10
-sky.Parent = Lighting
+closeButton.MouseLeave:Connect(function()
+	local tween = TweenService:Create(closeButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(200, 60, 60)})
+	tween:Play()
+end)
 
--- Set time of day to daytime
-Lighting.TimeOfDay = "14:00:00"
-Lighting.ClockTime = 14
-Lighting.Brightness = 2
-Lighting.Ambient = Color3.fromRGB(138, 138, 138)
-Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
-
--- 5. Prevent fall damage in lobby
-Players.PlayerAdded:Connect(function(player)
-	player.CharacterAdded:Connect(function(character)
-		local humanoid = character:WaitForChild("Humanoid", 5)
-		if humanoid then
-			humanoid.FallDamage = false
-		end
+closeButton.MouseButton1Click:Connect(function()
+	local fadeOut = TweenService:Create(mainFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+		BackgroundTransparency = 1,
+		Position = UDim2.new(0.5, -250, 0.5, -170)
+	})
+	
+	local textFadeOut = TweenService:Create(titleLabel, TweenInfo.new(0.2), {TextTransparency = 1})
+	local subFadeOut = TweenService:Create(subtitleLabel, TweenInfo.new(0.2), {TextTransparency = 1})
+	local btnFadeOut = TweenService:Create(closeButton, TweenInfo.new(0.2), {BackgroundTransparency = 1, TextTransparency = 1})
+	
+	fadeOut:Play()
+	textFadeOut:Play()
+	subFadeOut:Play()
+	btnFadeOut:Play()
+	
+	fadeOut.Completed:Connect(function()
+		screenGui.Enabled = false
 	end)
 end)
 
-print("Pre-game lobby initialized successfully!")
+mainFrame.BackgroundTransparency = 1
+titleLabel.TextTransparency = 1
+subtitleLabel.TextTransparency = 1
+closeButton.BackgroundTransparency = 1
+closeButton.TextTransparency = 1
+
+local fadeIn = TweenService:Create(mainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+	BackgroundTransparency = 0.1,
+	Position = UDim2.new(0.5, -250, 0.5, -150)
+})
+local titleFadeIn = TweenService:Create(titleLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {TextTransparency = 0})
+local subFadeIn = TweenService:Create(subtitleLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {TextTransparency = 0})
+local btnFadeIn = TweenService:Create(closeButton, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {BackgroundTransparency = 0, TextTransparency = 0})
+
+fadeIn:Play()
+titleFadeIn:Play()
+subFadeIn:Play()
+btnFadeIn:Play()
