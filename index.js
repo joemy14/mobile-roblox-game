@@ -1,75 +1,92 @@
 const express = require('express');
-const cors = require('cors'); // This was missing before!
+const cors = require('cors');
 const { OpenAI } = require('openai');
 const { Octokit } = require('@octokit/rest');
 
 const app = express();
-
-// Setup Middleware
-app.use(cors()); // Allow browser to talk to server
+app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
 
-console.log("✅ Server starting...");
+console.log("✅ Smart Builder Server starting...");
 
-// Setup AI (Using the free Nvidia model you found)
 const ai = new OpenAI({
   baseURL: "https://openrouter.ai/api/v1",
   apiKey: process.env.AI_API_KEY
 });
 
-// Setup GitHub
 const octokit = new Octokit({ auth: process.env.GITHUB_PAT });
 const owner = process.env.GITHUB_OWNER;
 const repo = process.env.GITHUB_REPO;
 
-// The Magic Endpoint
 app.post('/api/build', async (req, res) => {
   console.log("🔥 Request received!");
-  console.log("Prompt:", req.body.prompt);
-  console.log("File Path:", req.body.filePath);
+  const { prompt, filePath } = req.body;
   
   try {
-    console.log("⏳ Asking AI...");
-    const response = await ai.chat.completions.create({
-      model: "nvidia/nemotron-3-ultra-550b-a55b:free", 
-      messages: [{ 
-        role: "user", 
-        content: `Write ONLY valid Roblox Luau code for this request: ${req.body.prompt}. Do not use markdown code blocks. Output raw text only.` 
-      }]
-    });
-    
-    let code = response.choices[0].message.content;
-    code = code.replace(/```luau/g, '').replace(/```/g, '').trim();
-    console.log("✅ AI done. Length:", code.length);
-
-    // GitHub Logic
+    // 1. READ: Check if file exists and get current code
+    let currentCode = "";
     let sha = null;
+    
     try {
-      const { data } = await octokit.repos.getContent({ owner, repo, path: req.body.filePath });
+      const { data } = await octokit.repos.getContent({ owner, repo, path: filePath });
       sha = data.sha;
-      console.log("File exists, got SHA");
-    } catch(e) { 
-      console.log("New file, no SHA needed"); 
+      // Decode the Base64 content from GitHub
+      currentCode = Buffer.from(data.content, 'base64').toString('utf-8');
+      console.log("🧠 Memory loaded! Existing code length:", currentCode.length);
+    } catch (e) {
+      console.log("📄 New file created. No memory yet.");
     }
 
-    console.log("⏳ Pushing to GitHub...");
-    await octokit.repos.createOrUpdateFileContents({
-      owner, repo, path: req.body.filePath,
-      message: `AI Update: ${req.body.prompt.substring(0, 30)}...`,
-      content: Buffer.from(code).toString('base64'),
-      sha: sha
-    });
-    console.log("✅ Pushed to GitHub!");
+    // 2. THINK: Create a smart prompt
+    let aiPrompt = "";
+    if (currentCode.length > 0) {
+      aiPrompt = `You are an expert Roblox Luau developer. 
+      
+Here is the CURRENT code in the file:
+\`\`\`luau
+${currentCode}
+\`\`\`
 
-    // ALWAYS send a success response
-    res.json({ success: true, message: "✅ Success! Check GitHub Actions." });
+USER REQUEST: "${prompt}"
+
+INSTRUCTIONS:
+1. Update the code above to fulfill the user request.
+2. CRITICAL: Do NOT delete existing features unless asked. Keep the game working.
+3. Return the COMPLETE, updated file. Do not just return the new lines.
+4. Output ONLY the raw code. No markdown blocks.`;
+    } else {
+      aiPrompt = `Write a complete Roblox Luau script for this request: "${prompt}". Output ONLY raw code.`;
+    }
+
+    console.log(" Asking AI with memory...");
+    
+    // 3. WRITE: Get the new code
+    const response = await ai.chat.completions.create({
+      model: "nvidia/nemotron-3-ultra-550b-a55b:free", 
+      messages: [{ role: "user", content: aiPrompt }]
+    });
+    
+    let newCode = response.choices[0].message.content;
+    // Clean up any accidental markdown
+    newCode = newCode.replace(/```luau/g, '').replace(/```/g, '').trim();
+    console.log("✅ AI generated new code. Length:", newCode.length);
+
+    // 4. SAVE: Push to GitHub
+    await octokit.repos.createOrUpdateFileContents({
+      owner, repo, path: filePath,
+      message: `AI Update: ${prompt.substring(0, 30)}...`,
+      content: Buffer.from(newCode).toString('base64'),
+      sha: sha // This tells GitHub we are updating, not overwriting blindly
+    });
+    
+    console.log("✅ Pushed to GitHub!");
+    res.json({ success: true, message: "✅ Code updated with memory!" });
+
   } catch (err) {
-    console.error("❌ CRITICAL ERROR:", err.message);
-    // ALWAYS send an error response
+    console.error("❌ Error:", err.message);
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => console.log(`🚀 Running on port ${PORT}`));
