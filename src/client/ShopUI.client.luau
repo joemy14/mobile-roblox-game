@@ -37,6 +37,13 @@ local OpenCorner = Instance.new("UICorner")
 OpenCorner.CornerRadius = UDim.new(0.3, 0)
 OpenCorner.Parent = OpenButton
 
+local OpenStroke = Instance.new("UIStroke")
+OpenStroke.Color = Color3.fromRGB(40, 40, 40)
+OpenStroke.Thickness = 2
+OpenStroke.Transparency = 0
+OpenStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+OpenStroke.Parent = OpenButton
+
 local ShopFrame = Instance.new("Frame")
 ShopFrame.Name = "ShopFrame"
 ShopFrame.Size = UDim2.new(0, 300, 0, 380)
