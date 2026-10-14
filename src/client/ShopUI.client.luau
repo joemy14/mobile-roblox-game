@@ -150,7 +150,7 @@ local BuyItemEvent = ReplicatedStorage:WaitForChild("BuyItemEvent")
 local ShopUpdateEvent = ReplicatedStorage:WaitForChild("ShopUpdateEvent")
 
 OpenButton.MouseButton1Click:Connect(function()
-	ShopFrame.Visible = not ShopFrame.Visible
+	ShopFrame.Visible = true
 end)
 
 CloseButton.MouseButton1Click:Connect(function()
