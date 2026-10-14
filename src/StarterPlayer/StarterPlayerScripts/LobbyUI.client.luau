@@ -1,91 +1,73 @@
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local PlayerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "LobbyUI"
-screenGui.ResetOnSpawn = false
-screenGui.Parent = PlayerGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "LobbyUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
 
-local frame = Instance.new("Frame")
-frame.Name = "MainFrame"
-frame.Size = UDim2.fromScale(0.4, 0.5)
-frame.Position = UDim2.fromScale(0.5, 0.5)
-frame.AnchorPoint = Vector2.new(0.5, 0.5)
-frame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-frame.BorderSizePixel = 0
-frame.Parent = screenGui
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0.4, 0, 0.5, 0)
+MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+MainFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+MainFrame.BorderSizePixel = 0
+MainFrame.Parent = ScreenGui
 
-local uiCorner = Instance.new("UICorner")
-uiCorner.CornerRadius = UDim.new(0.05, 0)
-uiCorner.Parent = frame
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0.05, 0)
+UICorner.Parent = MainFrame
 
-local uiAspectRatio = Instance.new("UIAspectRatioConstraint")
-uiAspectRatio.AspectRatio = 0.8
-uiAspectRatio.DominantAxis = Enum.DominantAxis.Width
-uiAspectRatio.Parent = frame
+local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
+UIAspectRatioConstraint.AspectRatio = 0.8
+UIAspectRatioConstraint.DominantAxis = Enum.DominantAxis.Height
+UIAspectRatioConstraint.Parent = MainFrame
 
-local uiPadding = Instance.new("UIPadding")
-uiPadding.PaddingTop = UDim.new(0.05, 0)
-uiPadding.PaddingBottom = UDim.new(0.05, 0)
-uiPadding.PaddingLeft = UDim.new(0.05, 0)
-uiPadding.PaddingRight = UDim.new(0.05, 0)
-uiPadding.Parent = frame
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Name = "TitleLabel"
+TitleLabel.Size = UDim2.new(0.9, 0, 0.25, 0)
+TitleLabel.Position = UDim2.new(0.5, 0, 0.15, 0)
+TitleLabel.AnchorPoint = Vector2.new(0.5, 0)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text = "Infected Engkanto"
+TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleLabel.TextScaled = true
+TitleLabel.Font = Enum.Font.GothamBold
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Center
+TitleLabel.TextYAlignment = Enum.TextYAlignment.Center
+TitleLabel.Parent = MainFrame
 
-local uiListLayout = Instance.new("UIListLayout")
-uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-uiListLayout.Padding = UDim.new(0.03, 0)
-uiListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-uiListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-uiListLayout.Parent = frame
+local SubtitleLabel = Instance.new("TextLabel")
+SubtitleLabel.Name = "SubtitleLabel"
+SubtitleLabel.Size = UDim2.new(0.9, 0, 0.15, 0)
+SubtitleLabel.Position = UDim2.new(0.5, 0, 0.4, 0)
+SubtitleLabel.AnchorPoint = Vector2.new(0.5, 0)
+SubtitleLabel.BackgroundTransparency = 1
+SubtitleLabel.Text = "Choose your role and prepare!"
+SubtitleLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+SubtitleLabel.TextScaled = true
+SubtitleLabel.Font = Enum.Font.Gotham
+SubtitleLabel.TextXAlignment = Enum.TextXAlignment.Center
+SubtitleLabel.TextYAlignment = Enum.TextYAlignment.Center
+SubtitleLabel.Parent = MainFrame
 
-local titleLabel = Instance.new("TextLabel")
-titleLabel.Name = "TitleLabel"
-titleLabel.Size = UDim2.fromScale(1, 0.3)
-titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "Infected Engkanto"
-titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-titleLabel.TextScaled = true
-titleLabel.Font = Enum.Font.GothamBold
-titleLabel.TextWrapped = true
-titleLabel.LayoutOrder = 1
-titleLabel.Parent = frame
+local CloseButton = Instance.new("TextButton")
+CloseButton.Name = "CloseButton"
+CloseButton.Size = UDim2.new(0.4, 0, 0.12, 0)
+CloseButton.Position = UDim2.new(0.5, 0, 0.85, 0)
+CloseButton.AnchorPoint = Vector2.new(0.5, 0)
+CloseButton.BackgroundColor3 = Color3.fromRGB(180, 60, 60)
+CloseButton.BorderSizePixel = 0
+CloseButton.Text = "Close"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextScaled = true
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.Parent = MainFrame
 
-local subtitleLabel = Instance.new("TextLabel")
-subtitleLabel.Name = "SubtitleLabel"
-subtitleLabel.Size = UDim2.fromScale(1, 0.2)
-subtitleLabel.BackgroundTransparency = 1
-subtitleLabel.Text = "Choose your role and prepare!"
-subtitleLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-subtitleLabel.TextScaled = true
-subtitleLabel.Font = Enum.Font.Gotham
-subtitleLabel.TextWrapped = true
-subtitleLabel.LayoutOrder = 2
-subtitleLabel.Parent = frame
+local ButtonCorner = Instance.new("UICorner")
+ButtonCorner.CornerRadius = UDim.new(0.2, 0)
+ButtonCorner.Parent = CloseButton
 
-local spacer = Instance.new("Frame")
-spacer.Name = "Spacer"
-spacer.Size = UDim2.fromScale(1, 0.3)
-spacer.BackgroundTransparency = 1
-spacer.LayoutOrder = 3
-spacer.Parent = frame
-
-local closeButton = Instance.new("TextButton")
-closeButton.Name = "CloseButton"
-closeButton.Size = UDim2.fromScale(0.5, 0.15)
-closeButton.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
-closeButton.BorderSizePixel = 0
-closeButton.Text = "Close"
-closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeButton.TextScaled = true
-closeButton.Font = Enum.Font.GothamBold
-closeButton.LayoutOrder = 4
-closeButton.Parent = frame
-
-local buttonCorner = Instance.new("UICorner")
-buttonCorner.CornerRadius = UDim.new(0.2, 0)
-buttonCorner.Parent = closeButton
-
-closeButton.MouseButton1Click:Connect(function()
-	screenGui.Enabled = false
+CloseButton.MouseButton1Click:Connect(function()
+	ScreenGui.Enabled = false
 end)
