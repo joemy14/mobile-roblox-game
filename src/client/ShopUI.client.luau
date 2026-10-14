@@ -2,105 +2,110 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 
-local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
-local shopGui = Instance.new("ScreenGui")
-shopGui.Name = "ShopGui"
-shopGui.ResetOnSpawn = false
-shopGui.Parent = playerGui
+local ShopGui = Instance.new("ScreenGui")
+ShopGui.Name = "ShopGui"
+ShopGui.ResetOnSpawn = false
+ShopGui.Parent = PlayerGui
 
-local openButton = Instance.new("TextButton")
-openButton.Name = "OpenShopButton"
-openButton.Text = "Open Shop"
-openButton.Font = Enum.Font.GothamBold
-openButton.TextSize = 18
-openButton.TextColor3 = Color3.new(1, 1, 1)
-openButton.TextStrokeTransparency = 0.8
-openButton.Size = UDim2.new(0, 160, 0, 50)
-openButton.Position = UDim2.new(1, -180, 1, -70)
-openButton.AnchorPoint = Vector2.new(0, 0)
-openButton.BackgroundColor3 = Color3.new(1, 1, 1)
-openButton.BorderSizePixel = 0
-openButton.Parent = shopGui
+local OpenButton = Instance.new("TextButton")
+OpenButton.Name = "OpenShopButton"
+OpenButton.Text = "OPEN SHOP"
+OpenButton.Font = Enum.Font.GothamBold
+OpenButton.TextSize = 18
+OpenButton.TextColor3 = Color3.new(1, 1, 1)
+OpenButton.TextStrokeTransparency = 0.5
+OpenButton.Size = UDim2.new(0, 140, 0, 45)
+OpenButton.Position = UDim2.new(1, -160, 1, -60)
+OpenButton.AnchorPoint = Vector2.new(1, 1)
+OpenButton.BackgroundColor3 = Color3.new(1, 1, 1)
+OpenButton.BorderSizePixel = 0
+OpenButton.AutoButtonColor = true
+OpenButton.Parent = ShopGui
 
-local openGradient = Instance.new("UIGradient")
-openGradient.Color = ColorSequence.new({
+local OpenGradient = Instance.new("UIGradient")
+OpenGradient.Color = ColorSequence.new{
 	ColorSequenceKeypoint.new(0, Color3.fromRGB(180, 255, 100)),
 	ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 200, 50))
-})
-openGradient.Rotation = 90
-openGradient.Parent = openButton
+}
+OpenGradient.Rotation = 90
+OpenGradient.Parent = OpenButton
 
-local openCorner = Instance.new("UICorner")
-openCorner.CornerRadius = UDim.new(0.3, 0)
-openCorner.Parent = openButton
+local OpenCorner = Instance.new("UICorner")
+OpenCorner.CornerRadius = UDim.new(0.3, 0)
+OpenCorner.Parent = OpenButton
 
-local shopFrame = Instance.new("Frame")
-shopFrame.Name = "ShopFrame"
-shopFrame.Size = UDim2.new(0, 300, 0, 400)
-shopFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-shopFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-shopFrame.BackgroundColor3 = Color3.new(1, 1, 1)
-shopFrame.BorderSizePixel = 0
-shopFrame.Visible = false
-shopFrame.Parent = shopGui
+local ShopFrame = Instance.new("Frame")
+ShopFrame.Name = "ShopFrame"
+ShopFrame.Size = UDim2.new(0, 300, 0, 380)
+ShopFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+ShopFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+ShopFrame.BackgroundColor3 = Color3.new(1, 1, 1)
+ShopFrame.BorderSizePixel = 0
+ShopFrame.Visible = false
+ShopFrame.Active = true
+ShopFrame.Draggable = true
+ShopFrame.Parent = ShopGui
 
-local frameGradient = Instance.new("UIGradient")
-frameGradient.Color = ColorSequence.new({
+local FrameGradient = Instance.new("UIGradient")
+FrameGradient.Color = ColorSequence.new{
 	ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 30, 60)),
 	ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 15, 30))
-})
-frameGradient.Rotation = 90
-frameGradient.Parent = shopFrame
+}
+FrameGradient.Rotation = 45
+FrameGradient.Parent = ShopFrame
 
-local frameCorner = Instance.new("UICorner")
-frameCorner.CornerRadius = UDim.new(0.2, 0)
-frameCorner.Parent = shopFrame
+local FrameCorner = Instance.new("UICorner")
+FrameCorner.CornerRadius = UDim.new(0.2, 0)
+FrameCorner.Parent = ShopFrame
 
-local listLayout = Instance.new("UIListLayout")
-listLayout.Padding = UDim.new(0, 10)
-listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-listLayout.VerticalAlignment = Enum.VerticalAlignment.Top
-listLayout.SortOrder = Enum.SortOrder.LayoutOrder
-listLayout.Parent = shopFrame
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Padding = UDim.new(0, 10)
+UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Parent = ShopFrame
 
-local padding = Instance.new("UIPadding")
-padding.PaddingTop = UDim.new(0, 15)
-padding.PaddingBottom = UDim.new(0, 15)
-padding.PaddingLeft = UDim.new(0, 15)
-padding.PaddingRight = UDim.new(0, 15)
-padding.Parent = shopFrame
+local UIPadding = Instance.new("UIPadding")
+UIPadding.PaddingTop = UDim.new(0, 15)
+UIPadding.PaddingBottom = UDim.new(0, 15)
+UIPadding.PaddingLeft = UDim.new(0, 20)
+UIPadding.PaddingRight = UDim.new(0, 20)
+UIPadding.Parent = ShopFrame
 
-local coinLabel = Instance.new("TextLabel")
-coinLabel.Name = "CoinLabel"
-coinLabel.Text = "Coins: 0"
-coinLabel.Font = Enum.Font.GothamBold
-coinLabel.TextSize = 24
-coinLabel.TextColor3 = Color3.new(1, 1, 1)
-coinLabel.BackgroundTransparency = 1
-coinLabel.Size = UDim2.new(1, 0, 0, 40)
-coinLabel.LayoutOrder = 1
-coinLabel.Parent = shopFrame
+local CoinLabel = Instance.new("TextLabel")
+CoinLabel.Name = "CoinLabel"
+CoinLabel.Text = "Coins: 0"
+CoinLabel.Font = Enum.Font.GothamBold
+CoinLabel.TextSize = 24
+CoinLabel.TextColor3 = Color3.new(1, 1, 1)
+CoinLabel.TextStrokeTransparency = 0.5
+CoinLabel.BackgroundTransparency = 1
+CoinLabel.Size = UDim2.new(1, 0, 0, 40)
+CoinLabel.LayoutOrder = 1
+CoinLabel.Parent = ShopFrame
 
-local function createBuyButton(text, layoutOrder, itemName)
+local function createBuyButton(text, layoutOrder)
 	local btn = Instance.new("TextButton")
-	btn.Name = itemName .. "Button"
+	btn.Name = text:gsub(" ", "") .. "Button"
 	btn.Text = text
 	btn.Font = Enum.Font.GothamSemibold
-	btn.TextSize = 20
+	btn.TextSize = 18
 	btn.TextColor3 = Color3.new(0, 0, 0)
+	btn.TextStrokeTransparency = 0.8
 	btn.Size = UDim2.new(1, 0, 0, 50)
 	btn.BackgroundColor3 = Color3.new(1, 1, 1)
 	btn.BorderSizePixel = 0
+	btn.AutoButtonColor = true
 	btn.LayoutOrder = layoutOrder
-	btn.Parent = shopFrame
+	btn.Parent = ShopFrame
 
 	local grad = Instance.new("UIGradient")
-	grad.Color = ColorSequence.new({
+	grad.Color = ColorSequence.new{
 		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 220, 100)),
 		ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 160, 50))
-	})
+	}
 	grad.Rotation = 90
 	grad.Parent = btn
 
@@ -111,57 +116,59 @@ local function createBuyButton(text, layoutOrder, itemName)
 	return btn
 end
 
-local speedBtn = createBuyButton("Buy Speed (100)", 2, "Speed")
-local healthBtn = createBuyButton("Buy Health (150)", 3, "Health")
-local flashlightBtn = createBuyButton("Buy Flashlight (200)", 4, "Flashlight")
+local SpeedBtn = createBuyButton("Buy Speed (100)", 2)
+local HealthBtn = createBuyButton("Buy Health (150)", 3)
+local FlashlightBtn = createBuyButton("Buy Flashlight (200)", 4)
 
-local closeButton = Instance.new("TextButton")
-closeButton.Name = "CloseButton"
-closeButton.Text = "CLOSE"
-closeButton.Font = Enum.Font.GothamBold
-closeButton.TextSize = 20
-closeButton.TextColor3 = Color3.new(1, 1, 1)
-closeButton.Size = UDim2.new(1, 0, 0, 50)
-closeButton.BackgroundColor3 = Color3.new(1, 1, 1)
-closeButton.BorderSizePixel = 0
-closeButton.LayoutOrder = 5
-closeButton.Parent = shopFrame
+local CloseButton = Instance.new("TextButton")
+CloseButton.Name = "CloseButton"
+CloseButton.Text = "CLOSE"
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.TextSize = 18
+CloseButton.TextColor3 = Color3.new(1, 1, 1)
+CloseButton.TextStrokeTransparency = 0.5
+CloseButton.Size = UDim2.new(1, 0, 0, 45)
+CloseButton.BackgroundColor3 = Color3.new(1, 1, 1)
+CloseButton.BorderSizePixel = 0
+CloseButton.AutoButtonColor = true
+CloseButton.LayoutOrder = 5
+CloseButton.Parent = ShopFrame
 
-local closeGradient = Instance.new("UIGradient")
-closeGradient.Color = ColorSequence.new({
+local CloseGradient = Instance.new("UIGradient")
+CloseGradient.Color = ColorSequence.new{
 	ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 80, 80)),
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(180, 0, 0))
-})
-closeGradient.Rotation = 90
-closeGradient.Parent = closeButton
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(180, 40, 40))
+}
+CloseGradient.Rotation = 90
+CloseGradient.Parent = CloseButton
 
-local closeCorner = Instance.new("UICorner")
-closeCorner.CornerRadius = UDim.new(0.2, 0)
-closeCorner.Parent = closeButton
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0.2, 0)
+CloseCorner.Parent = CloseButton
 
-local buyItemEvent = ReplicatedStorage:WaitForChild("BuyItemEvent")
-local shopUpdateEvent = ReplicatedStorage:WaitForChild("ShopUpdateEvent")
+local BuyItemEvent = ReplicatedStorage:WaitForChild("BuyItemEvent")
+local ShopUpdateEvent = ReplicatedStorage:WaitForChild("ShopUpdateEvent")
 
-openButton.MouseButton1Click:Connect(function()
-	shopFrame.Visible = true
+OpenButton.MouseButton1Click:Connect(function()
+	ShopFrame.Visible = not ShopFrame.Visible
 end)
 
-closeButton.MouseButton1Click:Connect(function()
-	shopFrame.Visible = false
+CloseButton.MouseButton1Click:Connect(function()
+	ShopFrame.Visible = false
 end)
 
-local buttons = {
-	[speedBtn] = "Speed",
-	[healthBtn] = "Health",
-	[flashlightBtn] = "Flashlight"
+local buyButtons = {
+	[SpeedBtn] = "Speed",
+	[HealthBtn] = "Health",
+	[FlashlightBtn] = "Flashlight"
 }
 
-for btn, itemName in pairs(buttons) do
-	btn.MouseButton1Click:Connect(function()
-		buyItemEvent:FireServer(itemName)
+for button, itemName in pairs(buyButtons) do
+	button.MouseButton1Click:Connect(function()
+		BuyItemEvent:FireServer(itemName)
 	end)
 end
 
-shopUpdateEvent.OnClientEvent:Connect(function(coins)
-	coinLabel.Text = "Coins: " .. tostring(coins)
+ShopUpdateEvent.OnClientEvent:Connect(function(newCoinAmount)
+	CoinLabel.Text = "Coins: " .. tostring(newCoinAmount)
 end)
