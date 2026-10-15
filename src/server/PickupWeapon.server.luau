@@ -3,4 +3,5 @@ tablePart.Name = "Table"
 tablePart.Position = Vector3.new(10, 2, 10)
 tablePart.Size = Vector3.new(6, 1, 4)
 tablePart.Anchored = true
+tablePart.BrickColor = BrickColor.new("Brown")
 tablePart.Parent = workspace
