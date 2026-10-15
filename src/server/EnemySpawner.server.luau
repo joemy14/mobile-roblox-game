@@ -13,34 +13,35 @@ local function spawnEnemy()
 	humanoid.Health = 100
 	humanoid.Parent = enemy
 
-	local function getNearestRootPart()
-		local nearestRootPart = nil
-		local minDistance = math.huge
+	task.spawn(function()
+		while true do
+			if not enemy.Parent or humanoid.Health <= 0 then
+				break
+			end
 
-		for _, player in ipairs(game.Players:GetPlayers()) do
-			local character = player.Character
-			if character then
-				local rootPart = character:FindFirstChild("HumanoidRootPart")
-				if rootPart then
-					local distance = (enemy.Position - rootPart.Position).Magnitude
-					if distance < minDistance then
-						minDistance = distance
-						nearestRootPart = rootPart
+			local nearestRootPart = nil
+			local minDistance = math.huge
+
+			for _, player in ipairs(game.Players:GetPlayers()) do
+				local character = player.Character
+				if character then
+					local rootPart = character:FindFirstChild("HumanoidRootPart")
+					if rootPart then
+						local distance = (enemy.Position - rootPart.Position).Magnitude
+						if distance < minDistance then
+							minDistance = distance
+							nearestRootPart = rootPart
+						end
 					end
 				end
 			end
-		end
 
-		return nearestRootPart
-	end
-
-	task.spawn(function()
-		while enemy.Parent and humanoid.Health > 0 do
-			local targetRootPart = getNearestRootPart()
-			if targetRootPart then
-				humanoid:MoveTo(targetRootPart.Position)
+			if nearestRootPart then
+				humanoid:MoveTo(nearestRootPart.Position)
+				print("Enemy is moving!")
 			end
-			task.wait(1)
+
+			task.wait(0.5)
 		end
 	end)
 
