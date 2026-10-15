@@ -54,7 +54,7 @@ CoinDisplay.TextColor3 = Color3.new(1, 1, 1)
 CoinDisplay.TextStrokeTransparency = 0.5
 CoinDisplay.BackgroundTransparency = 1
 CoinDisplay.Size = UDim2.new(0, 150, 0, 40)
-CoinDisplay.Position = UDim2.new(0, 20, 1, -60)
+CoinDisplay.Position = UDim2.new(0, 20, 0.5, -80)
 CoinDisplay.AnchorPoint = Vector2.new(0, 1)
 CoinDisplay.Parent = ShopGui
 
