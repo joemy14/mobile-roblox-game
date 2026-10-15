@@ -1,7 +1,7 @@
 local tablePart = Instance.new("Part")
 tablePart.Name = "Table"
-tablePart.Position = Vector3.new(10, 2, 10)
+tablePart.Position = Vector3.new(0, 15, 10)
 tablePart.Size = Vector3.new(6, 1, 4)
-tablePart.Anchored = true
-tablePart.BrickColor = BrickColor.new("Brown")
+tablePart.BrickColor = BrickColor.new("Bright red")
+tablePart.Anchored = false
 tablePart.Parent = workspace
