@@ -9,6 +9,9 @@ Players.PlayerAdded:Connect(function(player)
 			if health <= 0 then
 				humanoid.Health = 1
 				character:SetAttribute("IsDowned", true)
+				humanoid.Sit = true
+				humanoid.WalkSpeed = 0
+				humanoid.JumpPower = 0
 				print(`[{player.Name}] is DOWNED!`)
 			end
 		end)
