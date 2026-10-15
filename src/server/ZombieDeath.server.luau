@@ -7,14 +7,15 @@ local function setupZombie(zombie)
 	
 	humanoid.HealthChanged:Connect(function(health)
 		if health <= 0 then
-			local position = zombie:GetPivot().Position
+			local humanoidRootPart = zombie:FindFirstChild("HumanoidRootPart")
+			local dropPos = humanoidRootPart and humanoidRootPart.Position or zombie:GetPivot().Position
 			zombie:Destroy()
 			task.wait(0.5)
 			
 			local coin = Instance.new("Part")
 			coin.Name = "Coin"
 			coin.Size = Vector3.new(1, 0.2, 1)
-			coin.Position = position + Vector3.new(0, 2, 0)
+			coin.Position = dropPos + Vector3.new(0, 2, 0)
 			coin.Anchored = true
 			coin.BrickColor = BrickColor.new("Bright yellow")
 			coin.Material = Enum.Material.Neon
