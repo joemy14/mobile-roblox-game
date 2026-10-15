@@ -19,6 +19,28 @@ local baston = Instance.new("Tool")
 baston.Name = "Baston"
 baston.Parent = tablePart
 
+baston.Activated:Connect(function()
+	local character = baston.Parent
+	if character and character:IsA("Model") then
+		local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+		if humanoidRootPart then
+			for _, obj in pairs(workspace:GetDescendants()) do
+				if obj:IsA("Model") and obj.Name == "Zombie" then
+					local zombieRootPart = obj:FindFirstChild("HumanoidRootPart")
+					local zombieHumanoid = obj:FindFirstChild("Humanoid")
+					if zombieRootPart and zombieHumanoid then
+						local distance = (zombieRootPart.Position - humanoidRootPart.Position).Magnitude
+						if distance <= 6 then
+							zombieHumanoid:TakeDamage(25)
+							print("Hit Zombie!")
+						end
+					end
+				end
+			end
+		end
+	end
+end)
+
 local handle = Instance.new("Part")
 handle.Name = "Handle"
 handle.Size = Vector3.new(1, 4, 1)
