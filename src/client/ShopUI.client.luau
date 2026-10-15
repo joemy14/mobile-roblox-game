@@ -17,13 +17,13 @@ OpenButton.Font = Enum.Font.GothamBold
 OpenButton.TextSize = 18
 OpenButton.TextColor3 = Color3.new(1, 1, 1)
 OpenButton.TextStrokeTransparency = 0.5
-OpenButton.Size = UDim2.new(0, 140, 0, 45)
-OpenButton.Position = UDim2.new(1, -160, 1, -60)
-OpenButton.AnchorPoint = Vector2.new(1, 1)
+OpenButton.Size = UDim2.new(0, 100, 0, 40)
+OpenButton.Position = UDim2.new(0, 20, 0.5, -25)
+OpenButton.AnchorPoint = Vector2.new(0, 0.5)
 OpenButton.BackgroundColor3 = Color3.new(1, 1, 1)
 OpenButton.BorderSizePixel = 0
 OpenButton.AutoButtonColor = true
-OpenButton.Visible = true -- Fix 1: Changed from false to true so button is visible
+OpenButton.Visible = true
 OpenButton.Parent = ShopGui
 
 local OpenGradient = Instance.new("UIGradient")
@@ -44,6 +44,19 @@ OpenStroke.Thickness = 2
 OpenStroke.Transparency = 0
 OpenStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 OpenStroke.Parent = OpenButton
+
+local CoinDisplay = Instance.new("TextLabel")
+CoinDisplay.Name = "CoinDisplay"
+CoinDisplay.Text = "Coins: 0"
+CoinDisplay.Font = Enum.Font.GothamBold
+CoinDisplay.TextSize = 20
+CoinDisplay.TextColor3 = Color3.new(1, 1, 1)
+CoinDisplay.TextStrokeTransparency = 0.5
+CoinDisplay.BackgroundTransparency = 1
+CoinDisplay.Size = UDim2.new(0, 150, 0, 40)
+CoinDisplay.Position = UDim2.new(0, 20, 1, -60)
+CoinDisplay.AnchorPoint = Vector2.new(0, 1)
+CoinDisplay.Parent = ShopGui
 
 local ShopFrame = Instance.new("Frame")
 ShopFrame.Name = "ShopFrame"
@@ -170,7 +183,6 @@ end
 
 OpenButton.MouseButton1Click:Connect(function()
 	ShopFrame.Visible = true
-	-- Fix 3: Update coin label from leaderstats when shop opens
 	local leaderstats = LocalPlayer:FindFirstChild("leaderstats")
 	if leaderstats then
 		local coins = leaderstats:FindFirstChild("Coins")
@@ -185,9 +197,9 @@ CloseButton.MouseButton1Click:Connect(function()
 end)
 
 local buyButtons = {
-	[SpeedBtn] = "SpeedBoost",      -- Fix 2: Updated to match server expected name
-	[HealthBtn] = "ExtraHealth",    -- Fix 2: Updated to match server expected name
-	[FlashlightBtn] = "Flashlight"  -- Fix 2: Already correct, kept as is
+	[SpeedBtn] = "SpeedBoost",
+	[HealthBtn] = "ExtraHealth",
+	[FlashlightBtn] = "Flashlight"
 }
 
 for button, itemName in pairs(buyButtons) do
@@ -198,6 +210,7 @@ end
 
 ShopUpdateEvent.OnClientEvent:Connect(function(newCoinAmount)
 	CoinLabel.Text = "Coins: " .. tostring(newCoinAmount)
+	CoinDisplay.Text = "Coins: " .. tostring(newCoinAmount)
 end)
 
 if RoleSelectedEvent:IsA("RemoteEvent") then
