@@ -23,7 +23,7 @@ OpenButton.AnchorPoint = Vector2.new(1, 1)
 OpenButton.BackgroundColor3 = Color3.new(1, 1, 1)
 OpenButton.BorderSizePixel = 0
 OpenButton.AutoButtonColor = true
-OpenButton.Visible = false
+OpenButton.Visible = true -- Fix 1: Changed from false to true so button is visible
 OpenButton.Parent = ShopGui
 
 local OpenGradient = Instance.new("UIGradient")
@@ -170,6 +170,14 @@ end
 
 OpenButton.MouseButton1Click:Connect(function()
 	ShopFrame.Visible = true
+	-- Fix 3: Update coin label from leaderstats when shop opens
+	local leaderstats = LocalPlayer:FindFirstChild("leaderstats")
+	if leaderstats then
+		local coins = leaderstats:FindFirstChild("Coins")
+		if coins then
+			CoinLabel.Text = "Coins: " .. tostring(coins.Value)
+		end
+	end
 end)
 
 CloseButton.MouseButton1Click:Connect(function()
@@ -177,9 +185,9 @@ CloseButton.MouseButton1Click:Connect(function()
 end)
 
 local buyButtons = {
-	[SpeedBtn] = "Speed",
-	[HealthBtn] = "Health",
-	[FlashlightBtn] = "Flashlight"
+	[SpeedBtn] = "SpeedBoost",      -- Fix 2: Updated to match server expected name
+	[HealthBtn] = "ExtraHealth",    -- Fix 2: Updated to match server expected name
+	[FlashlightBtn] = "Flashlight"  -- Fix 2: Already correct, kept as is
 }
 
 for button, itemName in pairs(buyButtons) do
