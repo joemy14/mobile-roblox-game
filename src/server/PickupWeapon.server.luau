@@ -23,6 +23,7 @@ local handle = Instance.new("Part")
 handle.Name = "Handle"
 handle.Size = Vector3.new(1, 4, 1)
 handle.BrickColor = BrickColor.new("Brown")
+handle.Position = Vector3.new(40, 5.5, 40)
 handle.Parent = baston
 
 local prompt = Instance.new("ProximityPrompt")
