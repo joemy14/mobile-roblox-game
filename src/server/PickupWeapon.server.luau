@@ -1,7 +1,8 @@
-local tablePart = Instance.new("Part")
-tablePart.Name = "Table"
-tablePart.Position = Vector3.new(-30, 15, -30)
-tablePart.Size = Vector3.new(6, 1, 4)
-tablePart.BrickColor = BrickColor.new("Bright red")
-tablePart.Anchored = false
-tablePart.Parent = workspace
+local part = Instance.new("Part")
+part.Name = "TestObject"
+part.Shape = Enum.PartType.Ball
+part.Position = Vector3.new(50, 15, 50)
+part.Size = Vector3.new(4, 4, 4)
+part.BrickColor = BrickColor.new("Bright yellow")
+part.Anchored = false
+part.Parent = workspace
