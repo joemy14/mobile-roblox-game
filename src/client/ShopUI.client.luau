@@ -157,9 +157,9 @@ CloseCorner.Parent = CloseButton
 local BuyItemEvent = ReplicatedStorage:WaitForChild("BuyItemEvent")
 local ShopUpdateEvent = ReplicatedStorage:WaitForChild("ShopUpdateEvent")
 
-local RoleSelectedEvent = ReplicatedStorage:WaitForChild("RoleSelectedEvent", 10)
+local RoleSelectedEvent = ReplicatedStorage:FindFirstChild("RoleSelectedEvent")
 if not RoleSelectedEvent then
-	warn("RoleSelectedEvent not found in ReplicatedStorage after 10 seconds")
+	warn("RoleSelectedEvent not found in ReplicatedStorage")
 	RoleSelectedEvent = Instance.new("BindableEvent")
 	RoleSelectedEvent.Name = "RoleSelectedEvent"
 end
