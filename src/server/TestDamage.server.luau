@@ -8,4 +8,11 @@ part.Parent = workspace
 
 part.Touched:Connect(function(hit)
 	print("Block touched!")
+	
+	local character = hit.Parent
+	local humanoid = character:FindFirstChild("Humanoid")
+	
+	if humanoid then
+		humanoid:TakeDamage(100)
+	end
 end)
