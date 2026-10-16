@@ -100,7 +100,12 @@ app.post('/api/build', async (req, res) => {
       ],
     });
 
-    const raw = completion.choices[0].message.content || '';
+    if (!completion.choices || completion.choices.length === 0) {
+  console.error('AI provider response:', JSON.stringify(completion));
+  const reason = completion.error?.message || 'the AI provider returned no answer (likely busy or rate-limited)';
+  return res.status(502).json({ error: 'AI error: ' + reason });
+}
+const raw = completion.choices[0].message.content || '';
     const cleaned = raw.replace(/^```(json)?\s*/i, '').replace(/```\s*$/, '').trim();
 
     let parsed;
