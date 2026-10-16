@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 10000;
 const OWNER = process.env.GITHUB_OWNER;
 const REPO = process.env.GITHUB_REPO;
 const BRANCH = process.env.GITHUB_BRANCH || 'ai-restructure';
-const MODEL = 'nvidia/nemotron-3-ultra-550b-a55b:free';
+const MODEL = 'nvidia/nemotron-3.5-lightning:free';
 
 const ai = new OpenAI({
   apiKey: process.env.AI_API_KEY,
