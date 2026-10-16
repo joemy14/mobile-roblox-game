@@ -54,7 +54,9 @@
         }
         
         const data = JSON.parse(rawText); 
-        output.innerText = data.message || data.error || "Done!";
+                output.innerText = data.error
+          ? "❌ " + data.error
+          : "✅ Saved: " + data.written + "\n" + (data.note || "");
       } catch (err) {
         output.innerText = "❌ Error: " + err.message;
       }
