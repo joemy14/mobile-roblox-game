@@ -2,24 +2,20 @@
   "name": "mobile-roblox-game",
   "tree": {
     "$className": "DataModel",
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "Shared": { "$path": "src/shared" }
+    },
     "ServerScriptService": {
       "$className": "ServerScriptService",
-      "$path": "src/server"
+      "Server": { "$path": "src/server" }
     },
     "StarterPlayer": {
       "$className": "StarterPlayer",
       "StarterPlayerScripts": {
         "$className": "StarterPlayerScripts",
-        "$path": "src/client"
+        "Client": { "$path": "src/client" }
       }
-    },
-    "StarterGui": {
-      "$className": "StarterGui",
-      "$path": "src/gui"
-    },
-    "ReplicatedStorage": {
-      "$className": "ReplicatedStorage",
-      "$path": "src/shared"
     }
   }
 }
