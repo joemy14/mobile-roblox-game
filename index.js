@@ -1,95 +1,135 @@
 const express = require('express');
 const cors = require('cors');
-const { OpenAI } = require('openai');
+const path = require('path');
+const fs = require('fs');
+const OpenAI = require('openai');
 const { Octokit } = require('@octokit/rest');
 
 const app = express();
 app.use(cors());
-app.use(express.json());
-app.get('/', (req, res) => {
-     res.sendFile(__dirname + '/index.html');
-   });
+app.use(express.json({ limit: '1mb' }));
+app.use(express.static(__dirname));
 
-console.log("✅ Smart Builder Server starting...");
+const PORT = process.env.PORT || 10000;
+const OWNER = process.env.GITHUB_OWNER;
+const REPO = process.env.GITHUB_REPO;
+const BRANCH = process.env.GITHUB_BRANCH || 'ai-restructure';
+const MODEL = 'nvidia/nemotron-3-ultra-550b-a55b:free';
 
 const ai = new OpenAI({
-  baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.AI_API_KEY
+  apiKey: process.env.AI_API_KEY,
+  baseURL: 'https://openrouter.ai/api/v1',
 });
+const gh = new Octokit({ auth: process.env.GITHUB_PAT });
 
-const octokit = new Octokit({ auth: process.env.GITHUB_PAT });
-const owner = process.env.GITHUB_OWNER;
-const repo = process.env.GITHUB_REPO;
+// Load the AI's instructions and knowledge from the repo
+function readRepoFile(p) {
+  return fs.existsSync(path.join(__dirname, p))
+    ? fs.readFileSync(path.join(__dirname, p), 'utf8')
+    : '';
+}
+
+function buildSystemPrompt() {
+  const knowledge = ['knowledge/mobile-rules.md', 'knowledge/simulator-playbook.md']
+    .map(p => `--- ${p} ---\n${readRepoFile(p)}`)
+    .join('\n\n');
+  return `${readRepoFile('prompts/system.md')}\n\n${knowledge}`;
+}
+
+// Read a file from GitHub, or return '' if it doesn't exist yet
+async function getFile(filePath) {
+  try {
+    const { data } = await gh.repos.getContent({
+      owner: OWNER, repo: REPO, path: filePath, ref: BRANCH,
+    });
+    return Buffer.from(data.content, 'base64').toString('utf8');
+  } catch (err) {
+    if (err.status === 404) return '';
+    throw err;
+  }
+}
+
+// Commit a file to GitHub, creating it if needed
+async function saveFile(filePath, content, message) {
+  let sha;
+  try {
+    const { data } = await gh.repos.getContent({
+      owner: OWNER, repo: REPO, path: filePath, ref: BRANCH,
+    });
+    sha = data.sha;
+  } catch (err) {
+    if (err.status !== 404) throw err;
+  }
+  await gh.repos.createOrUpdateFileContents({
+    owner: OWNER, repo: REPO, path: filePath, branch: BRANCH,
+    message, sha,
+    content: Buffer.from(content, 'utf8').toString('base64'),
+  });
+}
+
+// Make sure every path the AI returns is inside src/
+function isSafePath(p) {
+  return typeof p === 'string' && p.startsWith('src/') && !p.includes('..');
+}
 
 app.post('/api/build', async (req, res) => {
-  console.log("🔥 Request received!");
-  const { prompt, filePath } = req.body;
-  
+  const { prompt } = req.body || {};
+  if (!prompt || typeof prompt !== 'string') {
+    return res.status(400).json({ error: 'Send a "prompt" string.' });
+  }
+
   try {
-    // 1. READ: Check if file exists and get current code
-    let currentCode = "";
-    let sha = null;
-    
+    // Give the AI the current code so it updates instead of overwriting
+    const currentFiles = {};
+    for (const p of ['src/shared/Config.luau', 'src/main.server.luau']) {
+      currentFiles[p] = await getFile(p);
+    }
+    const context = Object.entries(currentFiles)
+      .map(([p, c]) => `--- ${p} ---\n${c || '(file does not exist yet)'}`)
+      .join('\n\n');
+
+    const completion = await ai.chat.completions.create({
+      model: MODEL,
+      temperature: 0.4,
+      messages: [
+        { role: 'system', content: buildSystemPrompt() },
+        {
+          role: 'user',
+          content: `Current code:\n${context}\n\nRequest: ${prompt}\n\nReturn only the JSON described in the rules.`,
+        },
+      ],
+    });
+
+    const raw = completion.choices[0].message.content || '';
+    const cleaned = raw.replace(/^```(json)?\s*/i, '').replace(/```\s*$/, '').trim();
+
+    let parsed;
     try {
-      const { data } = await octokit.repos.getContent({ owner, repo, path: filePath });
-      sha = data.sha;
-      // Decode the Base64 content from GitHub
-      currentCode = Buffer.from(data.content, 'base64').toString('utf-8');
-      console.log("🧠 Memory loaded! Existing code length:", currentCode.length);
-    } catch (e) {
-      console.log("📄 New file created. No memory yet.");
+      parsed = JSON.parse(cleaned);
+    } catch {
+      return res.status(502).json({ error: 'AI returned invalid JSON. Try again.', raw });
     }
 
-    // 2. THINK: Create a smart prompt
-    let aiPrompt = "";
-    if (currentCode.length > 0) {
-      aiPrompt = `You are an expert Roblox Luau developer. 
-      
-Here is the CURRENT code in the file:
-\`\`\`luau
-${currentCode}
-\`\`\`
-
-USER REQUEST: "${prompt}"
-
-INSTRUCTIONS:
-1. Update the code above to fulfill the user request.
-2. CRITICAL: Do NOT delete existing features unless asked. Keep the game working.
-3. Return the COMPLETE, updated file. Do not just return the new lines.
-4. Output ONLY the raw code. No markdown blocks.`;
-    } else {
-      aiPrompt = `Write a complete Roblox Luau script for this request: "${prompt}". Output ONLY raw code.`;
+    const files = (parsed.files || []).filter(f => isSafePath(f.path) && typeof f.content === 'string');
+    if (files.length === 0) {
+      return res.status(502).json({ error: 'AI returned no valid files.', raw });
     }
 
-    console.log(" Asking AI with memory...");
-    
-    // 3. WRITE: Get the new code
-    const response = await ai.chat.completions.create({
-      model: "nvidia/nemotron-3-ultra-550b-a55b:free", 
-      messages: [{ role: "user", content: aiPrompt }]
-    });
-    
-    let newCode = response.choices[0].message.content;
-    // Clean up any accidental markdown
-    newCode = newCode.replace(/```luau/g, '').replace(/```/g, '').trim();
-    console.log("✅ AI generated new code. Length:", newCode.length);
+    for (const f of files) {
+      await saveFile(f.path, f.content, `AI: ${prompt.slice(0, 60)}`);
+    }
 
-    // 4. SAVE: Push to GitHub
-    await octokit.repos.createOrUpdateFileContents({
-      owner, repo, path: filePath,
-      message: `AI Update: ${prompt.substring(0, 30)}...`,
-      content: Buffer.from(newCode).toString('base64'),
-      sha: sha // This tells GitHub we are updating, not overwriting blindly
+    res.json({
+      ok: true,
+      written: files.map(f => f.path),
+      note: 'Changes are on the ai-restructure branch. Check the Actions tab for the deploy.',
     });
-    
-    console.log("✅ Pushed to GitHub!");
-    res.json({ success: true, message: "✅ Code updated with memory!" });
-
   } catch (err) {
-    console.error("❌ Error:", err.message);
-    res.status(500).json({ success: false, error: err.message });
+    console.error(err);
+    res.status(500).json({ error: err.message });
   }
 });
 
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => console.log(`🚀 Running on port ${PORT}`));
+app.get('/health', (_, res) => res.json({ ok: true, branch: BRANCH }));
+
+app.listen(PORT, () => console.log(`Running on port ${PORT}`));
